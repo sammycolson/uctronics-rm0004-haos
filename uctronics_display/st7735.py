@@ -37,7 +37,9 @@ def _find_i2c_bus(addr: int = I2C_ADDR) -> int:
         bus_num = int(dev.split('-')[-1])
         try:
             b = smbus2.SMBus(bus_num)
-            b.read_byte(addr)
+            # write_quick sends only the address byte — works for write-only
+            # devices like the RM0004 bridge that ignore read requests
+            b.write_quick(addr)
             b.close()
             log.info("I2C: found 0x%02x on bus %d (%s)", addr, bus_num, dev)
             return bus_num

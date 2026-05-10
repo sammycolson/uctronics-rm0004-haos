@@ -1,5 +1,5 @@
 name: "UCTRONICS RM0004 Display"
-version: "1.0.5"
+version: "1.0.6"
 slug: "uctronics_display"
 description: >
   LCD stats display and power-button driver for the UCTRONICS RM0004

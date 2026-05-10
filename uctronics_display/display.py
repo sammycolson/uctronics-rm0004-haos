@@ -53,7 +53,9 @@ def _scan_all_i2c() -> None:
             found = []
             for addr in range(0x03, 0x78):
                 try:
-                    _bus.read_byte(addr)
+                    # write_quick detects write-only devices (like RM0004 bridge)
+                    # that don't respond to read_byte
+                    _bus.write_quick(addr)
                     found.append(f"0x{addr:02x}")
                 except Exception:
                     pass
