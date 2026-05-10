@@ -1,5 +1,11 @@
 # Changelog — UCTRONICS RM0004 Display
 
+## [1.0.2] — 2026-05-10
+
+### Fixed
+- `run.sh`: removed i2cdetect probe — `grep` returned exit 1 when 0x18 not found, which combined with bashio's `set -o pipefail` killed the script before Python could start
+- `run.sh`: use explicit `/usr/bin/python3` path; stripped to minimum to eliminate all potential bail-out points
+
 ## [1.0.1] — 2026-05-10
 
 ### Fixed
