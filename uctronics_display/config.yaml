@@ -1,0 +1,43 @@
+name: "UCTRONICS RM0004 Display"
+version: "1.0.0"
+slug: "uctronics_display"
+description: >
+  LCD stats display and power-button driver for the UCTRONICS RM0004
+  Pi Rack Pro on Raspberry Pi 5 with Home Assistant OS.
+  Shows rotating pages: IP, CPU, RAM, Disk, Temperature.
+  Short button press = toggle display. Long press = graceful shutdown.
+url: "https://github.com/sammycolson/uctronics-rm0004-haos"
+
+# ── Supported architecture ───────────────────────────────────────────────────
+arch:
+  - aarch64
+
+# ── Startup ──────────────────────────────────────────────────────────────────
+startup: system          # start before HA Core — display is infrastructure
+boot: auto
+init: false              # we manage our own init in run.sh
+
+# ── Supervisor API access (needed for host shutdown) ─────────────────────────
+hassio_api: true
+hassio_role: manager     # 'manager' allows ha host shutdown
+
+# ── Device access ────────────────────────────────────────────────────────────
+# /dev/i2c-1     : I²C bus → UCTRONICS bridge → ST7735 LCD
+# /dev/gpiochip4 : Pi 5 GPIO controller (RP1) → power button
+devices:
+  - /dev/i2c-1
+  - /dev/gpiochip4
+
+# SYS_RAWIO is required for direct I²C/GPIO hardware access inside the container
+privileged:
+  - SYS_RAWIO
+
+# AppArmor would block raw device access — disable it for this add-on
+apparmor: false
+
+# ── Options / Schema ─────────────────────────────────────────────────────────
+options: {}
+schema: {}
+
+# ── Image (built locally, not pulled from registry) ──────────────────────────
+# No 'image' key → HA builds from the Dockerfile in this directory

@@ -1,0 +1,4 @@
+channel: stable
+name: "UCTRONICS RM0004 Pi Rack Pro"
+url: "https://github.com/sammycolson/uctronics-rm0004-haos"
+maintainer: "sammycolson"
