@@ -2,14 +2,17 @@
 ST7735 LCD driver via UCTRONICS RM0004 I²C bridge.
 
 The RM0004 carries an MCU that bridges I²C (address 0x18) to SPI
-for the ST7735S 160×80 panel.  Protocol:
+for the ST7735S 160x80 panel.  Protocol:
 
-    bus.write_byte_data(0x18, 0x00, cmd)          → ST7735 command byte
-    bus.write_i2c_block_data(0x18, 0x01, [bytes]) → ST7735 data bytes
+    bus.write_byte_data(0x18, 0x00, cmd)          -> ST7735 command byte
+    bus.write_i2c_block_data(0x18, 0x01, [bytes]) -> ST7735 data bytes
 
-Tested on: Raspberry Pi 5, HAOS, /dev/i2c-1 at 400 kHz.
+On Pi 5 / HAOS the I2C bus number differs from Pi 4 (RP1 chip exposes
+buses like i2c-13, i2c-14).  _find_i2c_bus() detects the correct one
+automatically by probing all /dev/i2c-* devices for address 0x18.
 """
 
+import glob
 import time
 import logging
 import smbus2
@@ -21,8 +24,30 @@ WIDTH  = 160
 HEIGHT = 80
 
 # ── I²C bridge ─────────────────────────────────────────────────────────────
-I2C_BUS  = 1
 I2C_ADDR = 0x18
+
+
+def _find_i2c_bus(addr: int = I2C_ADDR) -> int:
+    """
+    Probe all /dev/i2c-* buses and return the number of the first one
+    that has a device responding at *addr*.  Falls back to 1 if none found.
+    """
+    for dev in sorted(glob.glob('/dev/i2c-*'),
+                      key=lambda d: int(d.split('-')[-1])):
+        bus_num = int(dev.split('-')[-1])
+        try:
+            b = smbus2.SMBus(bus_num)
+            b.read_byte(addr)
+            b.close()
+            log.info("I2C: found 0x%02x on bus %d (%s)", addr, bus_num, dev)
+            return bus_num
+        except Exception:
+            pass
+    log.warning("I2C: 0x%02x not found on any bus — defaulting to bus 1", addr)
+    return 1
+
+
+I2C_BUS = _find_i2c_bus()
 REG_CMD  = 0x00   # write to this register → ST7735 command
 REG_DATA = 0x01   # write to this register → ST7735 data
 

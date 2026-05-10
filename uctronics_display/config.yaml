@@ -1,5 +1,5 @@
 name: "UCTRONICS RM0004 Display"
-version: "1.0.4"
+version: "1.0.5"
 slug: "uctronics_display"
 description: >
   LCD stats display and power-button driver for the UCTRONICS RM0004
@@ -26,14 +26,8 @@ hassio_role: manager     # 'manager' allows ha host shutdown
 # /dev/gpiochip4 : Pi 5 GPIO controller (RP1) → power button
 devices:
   - /dev/i2c-1
-  - /dev/i2c-2
-  - /dev/i2c-3
-  - /dev/i2c-4
-  - /dev/i2c-5
-  - /dev/i2c-6
-  - /dev/i2c-20
-  - /dev/i2c-21
-  - /dev/i2c-22
+  - /dev/i2c-13
+  - /dev/i2c-14
 
 # SYS_RAWIO is required for direct I²C/GPIO hardware access inside the container
 privileged:
