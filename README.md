@@ -7,7 +7,7 @@ op **Raspberry Pi 5** met HAOS.
 
 | Add-on | Versie | Omschrijving |
 |--------|--------|--------------|
-| UCTRONICS RM0004 Display | 1.0.1 | LCD stats + power-button driver |
+| UCTRONICS RM0004 Display | 1.0.3 | LCD stats + power-button driver |
 
 ## Installeren in Home Assistant
 
