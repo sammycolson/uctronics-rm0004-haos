@@ -40,25 +40,29 @@ except Exception as _e:
 
 print("display.py: imports OK", flush=True)
 
-# ── I²C bus scan — logs every device found on bus 1 ─────────────────────────
-def _scan_i2c(bus_num: int = 1) -> list:
+# ── I²C bus scan — scans ALL buses in /dev/ and logs found devices ───────────
+def _scan_all_i2c() -> None:
+    import glob as _glob
     import smbus2 as _smbus2
-    found = []
-    try:
-        _bus = _smbus2.SMBus(bus_num)
-        for addr in range(0x03, 0x78):
-            try:
-                _bus.read_byte(addr)
-                found.append(f"0x{addr:02x}")
-            except Exception:
-                pass
-        _bus.close()
-    except Exception as e:
-        print(f"I2C scan error: {e}", flush=True)
-    return found
+    buses = sorted(_glob.glob('/dev/i2c-*'))
+    print(f"I2C buses in container: {buses if buses else 'NONE'}", flush=True)
+    for dev in buses:
+        try:
+            bus_num = int(dev.split('-')[-1])
+            _bus = _smbus2.SMBus(bus_num)
+            found = []
+            for addr in range(0x03, 0x78):
+                try:
+                    _bus.read_byte(addr)
+                    found.append(f"0x{addr:02x}")
+                except Exception:
+                    pass
+            _bus.close()
+            print(f"  {dev}: {', '.join(found) if found else 'empty'}", flush=True)
+        except Exception as e:
+            print(f"  {dev}: error ({e})", flush=True)
 
-_devices = _scan_i2c()
-print(f"I2C bus 1 scan: {', '.join(_devices) if _devices else 'NO DEVICES FOUND'}", flush=True)
+_scan_all_i2c()
 
 from st7735 import ST7735
 from stats  import (get_ip, get_cpu_percent, get_ram_info,
