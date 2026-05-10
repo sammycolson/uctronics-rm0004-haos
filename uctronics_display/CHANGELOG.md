@@ -1,6 +1,14 @@
 # Changelog — UCTRONICS RM0004 Display
 
-## [1.0.0] — 2025-05-10
+## [1.0.1] — 2026-05-10
+
+### Fixed
+- `run.sh`: added `2>&1` so Python stderr (tracebacks, import errors) appears in the HA log viewer
+- `run.sh`: removed special characters from log strings (encoding safety)
+- `config.yaml`: removed `/dev/gpiochip4` from devices list — if the device is absent on the host the supervisor no longer blocks the container start; button.py still opens it by path and fails gracefully
+- `display.py`: added early import diagnostics so PIL / smbus2 failures are immediately visible in logs
+
+## [1.0.0] — 2026-05-10
 
 ### Added
 - Full Python rewrite — no C compilation in container
