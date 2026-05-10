@@ -4,15 +4,15 @@ UCTRONICS RM0004 Pi Rack Pro — Home Assistant Add-on
 Main display loop.
 
 Pages rotate every PAGE_DURATION seconds:
-  0 → IP address   (interface end0)
-  1 → CPU usage %
-  2 → RAM usage %  + used/total GB
-  3 → Disk usage % + used/total GB
-  4 → CPU temperature
+  0 -> IP address   (interface end0)
+  1 -> CPU usage %
+  2 -> RAM usage %  + used/total GB
+  3 -> Disk usage % + used/total GB
+  4 -> CPU temperature
 
 Power button (BCM GPIO 4 / gpiochip4):
-  short press → toggle display on/off
-  long  press → ha host shutdown via Supervisor API
+  short press -> toggle display on/off
+  long  press -> ha host shutdown via Supervisor API
 """
 
 import os
@@ -21,7 +21,24 @@ import sys
 import time
 import logging
 
-from PIL import Image, ImageDraw, ImageFont
+# ── Early diagnostics — printed before any other work so crashes are visible ─
+print("display.py: starting, checking imports...", flush=True)
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    print("display.py: PIL OK", flush=True)
+except Exception as _e:
+    print(f"display.py: PIL import FAILED: {_e}", file=sys.stderr, flush=True)
+    sys.exit(1)
+
+try:
+    import smbus2  # noqa: F401
+    print("display.py: smbus2 OK", flush=True)
+except Exception as _e:
+    print(f"display.py: smbus2 import FAILED: {_e}", file=sys.stderr, flush=True)
+    sys.exit(1)
+
+print("display.py: imports OK", flush=True)
 
 from st7735 import ST7735
 from stats  import (get_ip, get_cpu_percent, get_ram_info,
