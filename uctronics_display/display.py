@@ -40,6 +40,26 @@ except Exception as _e:
 
 print("display.py: imports OK", flush=True)
 
+# ── I²C bus scan — logs every device found on bus 1 ─────────────────────────
+def _scan_i2c(bus_num: int = 1) -> list:
+    import smbus2 as _smbus2
+    found = []
+    try:
+        _bus = _smbus2.SMBus(bus_num)
+        for addr in range(0x03, 0x78):
+            try:
+                _bus.read_byte(addr)
+                found.append(f"0x{addr:02x}")
+            except Exception:
+                pass
+        _bus.close()
+    except Exception as e:
+        print(f"I2C scan error: {e}", flush=True)
+    return found
+
+_devices = _scan_i2c()
+print(f"I2C bus 1 scan: {', '.join(_devices) if _devices else 'NO DEVICES FOUND'}", flush=True)
+
 from st7735 import ST7735
 from stats  import (get_ip, get_cpu_percent, get_ram_info,
                     get_disk_percent, get_disk_gb, get_temperature)
@@ -227,6 +247,9 @@ def main() -> None:
         display.clear(BLACK)
     except Exception as exc:
         log.error("Display init failed: %s", exc)
+        log.error("Check: is /dev/i2c-1 the correct bus? Is the RM0004 powered?")
+        log.error("Run I2C scan above to find actual device address.")
+        time.sleep(30)   # pause so log is readable before s6 restarts
         sys.exit(1)
 
     # Button callbacks (called from button thread — keep fast)
